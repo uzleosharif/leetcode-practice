@@ -6,3 +6,4 @@ set(CMAKE_CXX_STANDARD 23)
 
 
 add_executable(roman2int roman2int.cpp)
+add_executable(leaf-similar-trees leaf_similar_trees.cpp)
