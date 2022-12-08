@@ -24,25 +24,7 @@ class Solution {
  private:
   const std::map<char, size_t> kAlphabetWeight{{'I', 1},   {'V', 5},   {'X', 10},  {'L', 50},
                                                {'C', 100}, {'D', 500}, {'M', 1000}};
-  void correction(const std::string& s, int& res) const;
 };
-
-void Solution::correction(const std::string& s, int& res) const {
-  // correction needed for special cases
-  // there are 6 instances where subtraction is used:
-  // 'I' can be placed before V and X -> subtract by 1
-  // 'X' can be placed before L and C -> subtract by 10
-  // 'C' can be placed before D and M -> subtract by 100
-
-  res -= (util::countSubstring(s, "IX") * kAlphabetWeight.at('I') * 2);
-  res -= (util::countSubstring(s, "IV") * kAlphabetWeight.at('I') * 2);
-
-  res -= (util::countSubstring(s, "XL") * kAlphabetWeight.at('X') * 2);
-  res -= (util::countSubstring(s, "XC") * kAlphabetWeight.at('X') * 2);
-
-  res -= (util::countSubstring(s, "CD") * kAlphabetWeight.at('C') * 2);
-  res -= (util::countSubstring(s, "CM") * kAlphabetWeight.at('C') * 2);
-}
 
 int Solution::romanToInt(std::string s) const {
   // spec:
@@ -51,9 +33,32 @@ int Solution::romanToInt(std::string s) const {
   // it is guaranteed that s is a valid roman numeral in the range [1,3999]
   int res{0};
 
+  // convenience functor
+  auto correction{[this, &s, &res]() {
+    // correction needed for special cases
+    // there are 6 instances where subtraction is used:
+    // 'I' can be placed before V and X -> subtract by 1
+    // 'X' can be placed before L and C -> subtract by 10
+    // 'C' can be placed before D and M -> subtract by 100
+
+    res -= (util::countSubstring(s, "IX") * kAlphabetWeight.at('I') * 2);
+    res -= (util::countSubstring(s, "IV") * kAlphabetWeight.at('I') * 2);
+
+    res -= (util::countSubstring(s, "XL") * kAlphabetWeight.at('X') * 2);
+    res -= (util::countSubstring(s, "XC") * kAlphabetWeight.at('X') * 2);
+
+    res -= (util::countSubstring(s, "CD") * kAlphabetWeight.at('C') * 2);
+    res -= (util::countSubstring(s, "CM") * kAlphabetWeight.at('C') * 2);
+  }};
+
+  // error detection
   if (s.length() > 15 || s.length() < 1) {
     throw std::invalid_argument{"passed input is not in valid range"};
   }
+
+  // traversing the input string to
+  // 1) error handling
+  // 2) count the occurrences of letters
   std::for_each(std::begin(s), std::end(s), [this, &res](const char& c) {
     if (!kAlphabetWeight.contains(c)) {
       throw std::invalid_argument{"passed input is not a roman numeral"};
@@ -61,7 +66,8 @@ int Solution::romanToInt(std::string s) const {
 
     res += kAlphabetWeight.at(c);
   });
-  correction(s, res);
+  // correction needed for special cases
+  correction();
 
   return res;
 }
