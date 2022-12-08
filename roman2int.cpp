@@ -76,6 +76,7 @@ int main() {
 
   } catch (const std::invalid_argument& ex) {
     std::cerr << ex.what() << '\n';
+    return EXIT_FAILURE;
   }
 
   return EXIT_SUCCESS;
